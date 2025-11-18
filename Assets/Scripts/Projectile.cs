@@ -1,19 +1,23 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
 {
     public float speed = 12f;
     public float lifeTime = 5f;
 
-    Rigidbody2D _rigidbody2D;
-    Vector2 _direction = Vector2.right;
+    Rigidbody _rigidbody;
+    Vector3 _direction = Vector3.forward;
     float _lifeTimer;
 
     void Awake()
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
+        _rigidbody = GetComponent<Rigidbody>();
+        if (_rigidbody != null)
+        {
+            _rigidbody.useGravity = false;
+        }
     }
 
     void OnEnable()
@@ -31,7 +35,7 @@ public class Projectile : MonoBehaviour
         }
     }
 
-    public void Initialize(Vector2 direction)
+    public void Initialize(Vector3 direction)
     {
         if (direction.sqrMagnitude > 0.001f)
             _direction = direction.normalized;
@@ -39,18 +43,20 @@ public class Projectile : MonoBehaviour
         ApplyVelocity();
     }
 
-    public void Reflect(Vector2 normal)
+    public void Reflect(Vector3 normal)
     {
-        _direction = Vector2.Reflect(_direction, normal).normalized;
+        _direction = Vector3.Reflect(_direction, normal).normalized;
         ApplyVelocity();
     }
 
     void ApplyVelocity()
     {
-        if (_rigidbody2D == null)
+        if (_rigidbody == null)
             return;
 
-        _rigidbody2D.linearVelocity = _direction * speed;
+        Vector3 velocity = _direction * speed;
+        velocity.y = 0f;
+        _rigidbody.linearVelocity = velocity;
     }
 }
 

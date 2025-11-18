@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
@@ -16,16 +16,16 @@ public class PlayerController : MonoBehaviour
     [Header("References")]
     public Camera gameplayCamera;
 
-    Rigidbody2D _rigidbody2D;
+    Rigidbody _rigidbody;
     Vector2 _moveInput;
-    Vector2 _aimDirection = Vector2.right;
+    Vector3 _aimDirection = Vector3.forward;
     float _lastShotTime;
 
-    public Vector2 AimDirection => _aimDirection;
+    public Vector3 AimDirection => _aimDirection;
 
     void Awake()
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
+        _rigidbody = GetComponent<Rigidbody>();
 
         if (gameplayCamera == null)
             gameplayCamera = Camera.main;
@@ -57,9 +57,9 @@ public class PlayerController : MonoBehaviour
             if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)
                 _moveInput.y -= 1f;
             if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
-                _moveInput.x += 1f;
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)
                 _moveInput.x -= 1f;
+            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)
+                _moveInput.x += 1f;
         }
 
         _moveInput = Vector2.ClampMagnitude(_moveInput, 1f);
@@ -67,8 +67,10 @@ public class PlayerController : MonoBehaviour
 
     void MoveCharacter()
     {
-        Vector2 targetVelocity = _moveInput * moveSpeed;
-        _rigidbody2D.linearVelocity = Vector2.Lerp(_rigidbody2D.linearVelocity, targetVelocity, Time.fixedDeltaTime * damping);
+        Vector3 targetVelocity = new Vector3(_moveInput.x, 0f, -_moveInput.y) * moveSpeed;
+        Vector3 newVelocity = Vector3.Lerp(_rigidbody.linearVelocity, targetVelocity, Time.fixedDeltaTime * damping);
+        newVelocity.y = 0f;
+        _rigidbody.linearVelocity = newVelocity;
     }
 
     void AimTowardsPointer()
@@ -80,15 +82,21 @@ public class PlayerController : MonoBehaviour
             return;
 
         Vector3 mouseScreenPosition = Mouse.current.position.ReadValue();
-        Vector3 world = gameplayCamera.ScreenToWorldPoint(mouseScreenPosition);
-        Vector2 direction = (world - transform.position);
-        direction.Normalize();
+        Ray ray = gameplayCamera.ScreenPointToRay(mouseScreenPosition);
+        Plane groundPlane = new Plane(Vector3.up, new Vector3(0f, transform.position.y, 0f));
 
-        if (direction.sqrMagnitude > 0.001f)
+        if (groundPlane.Raycast(ray, out float enter))
         {
-            _aimDirection = direction;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
+            Vector3 hitPoint = ray.GetPoint(enter);
+            Vector3 direction = hitPoint - transform.position;
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                _aimDirection = direction.normalized;
+                float angle = Mathf.Atan2(_aimDirection.x, _aimDirection.z) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            }
         }
     }
 
@@ -113,7 +121,8 @@ public class PlayerController : MonoBehaviour
         _lastShotTime = Time.time;
 
         Vector3 spawnPosition = projectileSpawnPoint.position;
-        Quaternion spawnRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(_aimDirection.y, _aimDirection.x) * Mathf.Rad2Deg - 90f);
+        spawnPosition.y = transform.position.y;
+        Quaternion spawnRotation = Quaternion.LookRotation(_aimDirection, Vector3.up);
         GameObject projectile = Instantiate(projectilePrefab, spawnPosition, spawnRotation);
 
         Projectile projectileComponent = projectile.GetComponent<Projectile>();
