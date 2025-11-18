@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour
     Vector2 _aimDirection = Vector2.right;
     float _lastShotTime;
 
+    public Vector2 AimDirection => _aimDirection;
+
     void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
