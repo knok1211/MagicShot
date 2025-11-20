@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public Camera gameplayCamera;
 
     Rigidbody _rigidbody;
-    Vector2 _moveInput;
+    Vector3 _moveInput;
     Vector3 _aimDirection = Vector3.forward;
     float _lastShotTime;
 
@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
         if (gameplayCamera == null)
             gameplayCamera = Camera.main;
@@ -48,26 +49,26 @@ public class PlayerController : MonoBehaviour
 
     void ReadInput()
     {
-        _moveInput = Vector2.zero;
+        _moveInput = Vector3.zero;
 
         if (Keyboard.current != null)
         {
             if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)
-                _moveInput.y += 1f;
+                _moveInput.z -= 1f;
             if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)
-                _moveInput.y -= 1f;
+                _moveInput.z += 1f;
             if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
                 _moveInput.x -= 1f;
             if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)
                 _moveInput.x += 1f;
         }
 
-        _moveInput = Vector2.ClampMagnitude(_moveInput, 1f);
+        _moveInput = Vector3.ClampMagnitude(_moveInput, 1f);
     }
 
     void MoveCharacter()
     {
-        Vector3 targetVelocity = new Vector3(_moveInput.x, 0f, -_moveInput.y) * moveSpeed;
+        Vector3 targetVelocity = new Vector3(_moveInput.x, 0f, _moveInput.z) * moveSpeed;
         Vector3 newVelocity = Vector3.Lerp(_rigidbody.linearVelocity, targetVelocity, Time.fixedDeltaTime * damping);
         newVelocity.y = 0f;
         _rigidbody.linearVelocity = newVelocity;
@@ -95,7 +96,7 @@ public class PlayerController : MonoBehaviour
             {
                 _aimDirection = direction.normalized;
                 float angle = Mathf.Atan2(_aimDirection.x, _aimDirection.z) * Mathf.Rad2Deg;
-                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+                transform.rotation = Quaternion.Euler(120, 0f, -angle);
             }
         }
     }
