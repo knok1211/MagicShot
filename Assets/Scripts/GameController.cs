@@ -87,8 +87,31 @@ public class GameController : MonoBehaviour
                     GameObject block = Instantiate(prefab, position, Quaternion.identity);
                     block.transform.parent = transform;
                     block.name = $"{(blockType == 1 ? "Normal" : "Ice")}Block_{x}_{z}";
+                    EnsureReflectiveComponents(block);
                 }
             }
+        }
+    }
+
+    void EnsureReflectiveComponents(GameObject block)
+    {
+        if (block == null)
+            return;
+
+        Collider collider = block.GetComponent<Collider>();
+        if (collider == null)
+        {
+            BoxCollider boxCollider = block.AddComponent<BoxCollider>();
+            Renderer renderer = block.GetComponentInChildren<Renderer>();
+            if (renderer != null)
+            {
+                boxCollider.size = renderer.bounds.size;
+            }
+        }
+
+        if (!block.TryGetComponent(out ProjectileReflector _))
+        {
+            block.AddComponent<ProjectileReflector>();
         }
     }
 

@@ -4,8 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
 {
+    [Header("Motion")]
     public float speed = 12f;
     public float lifeTime = 5f;
+    public float surfaceExitOffset = 0.02f;
 
     Rigidbody _rigidbody;
     Vector3 _direction = Vector3.forward;
@@ -17,6 +19,7 @@ public class Projectile : MonoBehaviour
         if (_rigidbody != null)
         {
             _rigidbody.useGravity = false;
+            _rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         }
     }
 
@@ -45,8 +48,33 @@ public class Projectile : MonoBehaviour
 
     public void Reflect(Vector3 normal)
     {
-        _direction = Vector3.Reflect(_direction, normal).normalized;
+        normal.y = 0f;
+        if (normal.sqrMagnitude < 0.0001f)
+        {
+            normal = -_direction;
+        }
+
+        _direction = Vector3.Reflect(_direction, normal.normalized).normalized;
+        transform.position += normal.normalized * surfaceExitOffset;
         ApplyVelocity();
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision == null)
+            return;
+
+        Vector3 hitNormal = collision.contacts.Length > 0
+            ? collision.contacts[0].normal
+            : -_direction;
+
+        if (collision.collider.TryGetComponent(out ProjectileReflector reflector))
+        {
+            reflector.HandleReflection(this, hitNormal);
+            return;
+        }
+
+        Destroy(gameObject);
     }
 
     void ApplyVelocity()
