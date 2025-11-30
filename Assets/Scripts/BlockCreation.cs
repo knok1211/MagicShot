@@ -6,10 +6,14 @@ public class BlockCreation : MonoBehaviour
     [Header("Block Prefabs")]
     public GameObject normalBlockPrefab;
     public GameObject iceBlockPrefab;
+    public GameObject fireBlockPrefab;
+    public GameObject poisonBlockPrefab;
 
     [Header("UI - 블록 이미지 (버튼으로 사용)")]
     public Image normalBlockImage;
     public Image iceBlockImage;
+    public Image fireBlockImage;
+    public Image poisonBlockImage;
 
     void Start()
     {
@@ -19,24 +23,23 @@ public class BlockCreation : MonoBehaviour
 
     void SetupBlockImages()
     {
-        if (normalBlockImage != null)
+        SetupBlockButton(normalBlockImage, normalBlockPrefab, 1);
+        SetupBlockButton(iceBlockImage, iceBlockPrefab, 2);
+        SetupBlockButton(fireBlockImage, fireBlockPrefab, 3);
+        SetupBlockButton(poisonBlockImage, poisonBlockPrefab, 4);
+    }
+
+    void SetupBlockButton(Image blockImage, GameObject prefab, int blockType)
+    {
+        if (blockImage != null)
         {
-            Sprite sprite = GetSpriteFromPrefab(normalBlockPrefab);
-            if (sprite != null) normalBlockImage.sprite = sprite;
+            Sprite sprite = GetSpriteFromPrefab(prefab);
+            if (sprite != null) blockImage.sprite = sprite;
             
-            Button button = normalBlockImage.GetComponent<Button>();
-            if (button == null) button = normalBlockImage.gameObject.AddComponent<Button>();
-            button.onClick.AddListener(() => CreateBlock(1));
-        }
-        
-        if (iceBlockImage != null)
-        {
-            Sprite sprite = GetSpriteFromPrefab(iceBlockPrefab);
-            if (sprite != null) iceBlockImage.sprite = sprite;
-            
-            Button button = iceBlockImage.GetComponent<Button>();
-            if (button == null) button = iceBlockImage.gameObject.AddComponent<Button>();
-            button.onClick.AddListener(() => CreateBlock(2));
+            Button button = blockImage.GetComponent<Button>();
+            if (button == null) button = blockImage.gameObject.AddComponent<Button>();
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => CreateBlock(blockType));
         }
     }
 
@@ -45,11 +48,24 @@ public class BlockCreation : MonoBehaviour
         if (GameController.Instance != null)
         {
             GameController.Instance.AddBlock(blockType);
-            Debug.Log($"{(blockType == 1 ? "일반" : "얼음")} 블록 생성!");
+            string blockName = GetBlockName(blockType);
+            Debug.Log($"{blockName} 블록 생성!");
         }
         else
         {
             Debug.LogError("GameController를 찾을 수 없습니다!");
+        }
+    }
+
+    string GetBlockName(int blockType)
+    {
+        switch (blockType)
+        {
+            case 1: return "일반";
+            case 2: return "얼음";
+            case 3: return "화염";
+            case 4: return "독";
+            default: return "알 수 없는";
         }
     }
 

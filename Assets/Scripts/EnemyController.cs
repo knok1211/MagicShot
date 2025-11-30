@@ -295,6 +295,10 @@ public class EnemyController : MonoBehaviour
                 if (blockMap[newZ, newX] != 0)
                     moveCost += 20f;
 
+                // 발사체가 지나간 위험 지역 비용 추가
+                if (GameController.Instance.dangerMap[newZ, newX] > 0f)
+                    moveCost += GameController.Instance.dangerMap[newZ, newX];
+
                 float newDist = distances[current.y, current.x] + moveCost;
 
                 if (newDist < distances[newZ, newX])

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4608122306516262053}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,9 +43,9 @@ GameObject:
   - component: {fileID: 327952122859008549}
   - component: {fileID: -3813823906124854641}
   - component: {fileID: -2400820074078462232}
-  - component: {fileID: 2767258560378605346}
-  - component: {fileID: -8877796168080419494}
-  m_Layer: 3
+  - component: {fileID: -585396114122422350}
+  - component: {fileID: -4234872672309616938}
+  m_Layer: 0
   m_Name: enemy2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79e49b5b8e6c1fc46a0ce0867c3ae63b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
+  moveSpeed: 2
   player: {fileID: 0}
 --- !u!54 &-2400820074078462232
 Rigidbody:
@@ -164,8 +164,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!136 &2767258560378605346
-CapsuleCollider:
+--- !u!135 &-585396114122422350
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -182,12 +182,10 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.05
-  m_Height: 0.1
-  m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-8877796168080419494
+--- !u!114 &-4234872672309616938
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
