@@ -9,6 +9,9 @@ public class Projectile : MonoBehaviour
     public float lifeTime = 2f;
     public float surfaceExitOffset = 0.02f;
 
+    [Header("Damage")]
+    public float damage = 10f;
+
     Rigidbody _rigidbody;
     Vector3 _direction = Vector3.forward;
     float _lifeTimer;
@@ -85,16 +88,32 @@ public class Projectile : MonoBehaviour
             ? collision.contacts[0].normal
             : -_direction;
 
-        // 블록 색상 확인 및 Point Light 색상 변경
-        ChangeColorByBlock(collision.gameObject);
-
         if (collision.collider.TryGetComponent(out ProjectileReflector reflector))
         {
+            // 반사 표면: 색상 변경 및 반사 처리
+            ChangeColorByBlock(collision.gameObject);
             reflector.HandleReflection(this, hitNormal);
             return;
         }
 
+        // 반사되지 않는 경우: 적/오브젝트에 데미지 적용 시도
+        TryApplyDamage(collision.collider);
+
+        // 블록 색상 확인 및 Point Light 색상 변경
+        ChangeColorByBlock(collision.gameObject);
+
         Destroy(gameObject);
+    }
+
+    void TryApplyDamage(Collider other)
+    {
+        if (other == null) return;
+
+        Health health = other.GetComponent<Health>();
+        if (health != null)
+        {
+            health.TakeDamage(damage);
+        }
     }
 
     void ChangeColorByBlock(GameObject block)

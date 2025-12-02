@@ -45,6 +45,9 @@ GameObject:
   - component: {fileID: -2400820074078462232}
   - component: {fileID: -585396114122422350}
   - component: {fileID: -4234872672309616938}
+  - component: {fileID: -9016013871591471368}
+  - component: {fileID: 187550611837508100}
+  - component: {fileID: 8977528569634753238}
   m_Layer: 0
   m_Name: enemy2
   m_TagString: Untagged
@@ -199,3 +202,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enableReflection: 1
   descriptor: Block
+--- !u!114 &-9016013871591471368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5466962345738802996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ca1257e69d5037408437b928a3286fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 30
+  currentHealth: 0
+  onDie:
+    m_PersistentCalls:
+      m_Calls: []
+  onHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &187550611837508100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5466962345738802996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdfe465234c37af47b351738731560e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewardAmount: 10
+--- !u!114 &8977528569634753238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5466962345738802996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3475d34a7308f7a43a31f1c68bfe07b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetTag: Player
+  damagePerSecond: 10
