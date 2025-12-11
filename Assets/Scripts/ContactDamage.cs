@@ -13,6 +13,13 @@ public class ContactDamage : MonoBehaviour
     [Tooltip("1초당 주는 피해량")]
     public float damagePerSecond = 10f;
 
+    [Tooltip("Ice 프로젝타일 여부")]
+    public bool isIceProjectile = false;
+
+    [Tooltip("poison 여부")]
+    public bool isPoisonProjectile = false;
+
+
     void OnCollisionStay(Collision collision)
     {
         if (collision == null) return;
@@ -39,6 +46,30 @@ public class ContactDamage : MonoBehaviour
             // 접촉 시간에 비례해서 체력이 줄어들도록 Time.deltaTime 사용
             float damageThisFrame = damagePerSecond * Time.deltaTime;
             health.TakeDamage(damageThisFrame);
+            
+            // Ice 프로젝타일 효과: enemy 속도 감소
+
+            if (isIceProjectile)
+            {
+                
+                EnemyController enemyController = targetCollider.GetComponent<EnemyController>();
+                if (enemyController != null)
+                {
+                    enemyController.ReduceSpeed(0.5f);
+                }
+            }
+
+                if (isPoisonProjectile)
+            {
+                
+                EnemyController enemyController = targetCollider.GetComponent<EnemyController>();
+                if (enemyController != null)
+                {
+                    health.TakePerDamage(0.1f);
+                }
+            }
+
+
         }
     }
 }

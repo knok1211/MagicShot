@@ -14,11 +14,19 @@ public class BlockCreation : MonoBehaviour
     public Image iceBlockImage;
     public Image fireBlockImage;
     public Image poisonBlockImage;
+    public Image deleteBlockImage;
+    public Button completeButton;
+
+    [Header("Cost UI")]
+    public Text costText;
+    private const int MAX_COST = 3;
 
     void Start()
     {
         gameObject.SetActive(true);
         SetupBlockImages();
+        SetupCompleteButton();
+        UpdateCostUI();
     }
 
     void SetupBlockImages()
@@ -27,6 +35,16 @@ public class BlockCreation : MonoBehaviour
         SetupBlockButton(iceBlockImage, iceBlockPrefab, 2);
         SetupBlockButton(fireBlockImage, fireBlockPrefab, 3);
         SetupBlockButton(poisonBlockImage, poisonBlockPrefab, 4);
+        SetupDeleteButton(deleteBlockImage);
+    }
+
+    void SetupCompleteButton()
+    {
+        if (completeButton != null)
+        {
+            completeButton.onClick.RemoveAllListeners();
+            completeButton.onClick.AddListener(() => OnCompleteButtonClicked());
+        }
     }
 
     void SetupBlockButton(Image blockImage, GameObject prefab, int blockType)
@@ -43,6 +61,17 @@ public class BlockCreation : MonoBehaviour
         }
     }
 
+    void SetupDeleteButton(Image deleteImage)
+    {
+        if (deleteImage != null)
+        {
+            Button button = deleteImage.GetComponent<Button>();
+            if (button == null) button = deleteImage.gameObject.AddComponent<Button>();
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => DeleteBlock());
+        }
+    }
+
     void CreateBlock(int blockType)
     {
         if (GameController.Instance != null)
@@ -50,11 +79,37 @@ public class BlockCreation : MonoBehaviour
             GameController.Instance.AddBlock(blockType);
             string blockName = GetBlockName(blockType);
             Debug.Log($"{blockName} 블록 생성!");
+            UpdateCostUI();
         }
         else
         {
             Debug.LogError("GameController를 찾을 수 없습니다!");
         }
+    }
+
+    void DeleteBlock()
+    {
+        if (GameController.Instance != null)
+        {
+            GameController.Instance.DeleteBlock();
+            Debug.Log("블록 삭제!");
+            UpdateCostUI();
+        }
+        else
+        {
+            Debug.LogError("GameController를 찾을 수 없습니다!");
+        }
+    }
+
+    void OnCompleteButtonClicked()
+    {
+        Debug.Log("설치 완료 버튼 클릭!");
+        if (GameController.Instance != null)
+        {
+            GameController.Instance.StartGame();
+            Debug.Log("게임 시작 호출됨");
+        }
+        gameObject.SetActive(false);
     }
 
     string GetBlockName(int blockType)
@@ -76,6 +131,15 @@ public class BlockCreation : MonoBehaviour
             return spriteRenderer.sprite;
         
         return null;
+    }
+
+    void UpdateCostUI()
+    {
+        if (costText != null && GameController.Instance != null)
+        {
+            int currentCost = GameController.Instance.GetCurrentCost();
+            costText.text = $"{currentCost}/{MAX_COST}";
+        }
     }
 
     void Update()

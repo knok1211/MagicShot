@@ -13,6 +13,18 @@ public class EnemyController : MonoBehaviour
     Vector3 _targetPosition;
     float _pathUpdateInterval = 0.1f;
     float _lastPathUpdateTime;
+    float _originalMoveSpeed;
+
+
+
+    private void Start()
+    {
+
+        enabled = false;
+
+    }
+
+
 
     void Awake()
     {
@@ -47,6 +59,21 @@ public class EnemyController : MonoBehaviour
             _lastPathUpdateTime = Time.time;
             UpdatePath();
         }
+
+
+        MarkCurrentPositionAsDanger();
+    }
+
+
+        void MarkCurrentPositionAsDanger()
+    {
+        if (GameController.Instance == null)
+            return;
+
+        int x = Mathf.RoundToInt(transform.position.x);
+        int z = Mathf.RoundToInt(transform.position.z);
+
+        GameController.Instance.MarkDangerZone(x, z, 2f);
     }
 
     void FixedUpdate()
@@ -175,6 +202,19 @@ public class EnemyController : MonoBehaviour
         {
             _rigidbody.linearVelocity = Vector3.zero;
         }
+    }
+
+    public void ReduceSpeed(float speedMultiplier, float duration = 10f)
+    {
+        Debug.Log($"적 속도 감소: {speedMultiplier}배, 지속시간: {duration}초");
+        _originalMoveSpeed = moveSpeed;
+        moveSpeed *= speedMultiplier;
+        Invoke(nameof(RestoreSpeed), duration);
+    }
+    
+    void RestoreSpeed()
+    {
+        moveSpeed = _originalMoveSpeed;
     }
 
     List<Vector2Int> FindPathDijkstra(int startX, int startZ, int endX, int endZ)
@@ -328,4 +368,11 @@ public class EnemyController : MonoBehaviour
         path.Reverse();
         return path.Count > 0 ? path : null;
     }
+
+
+    public void SetActive(bool active)
+{
+    enabled = active;
 }
+}
+

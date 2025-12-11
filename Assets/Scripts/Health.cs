@@ -34,6 +34,23 @@ public class Health : MonoBehaviour
         }
     }
 
+        public void TakePerDamage(float per)
+    {
+        if (currentHealth <= 0f) return;
+
+        currentHealth -= per*maxHealth;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        onHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        if (currentHealth <= 0f)
+        {
+            Die();
+        }
+    }
+
+
+
+
     public void Heal(float amount)
     {
         currentHealth += amount;

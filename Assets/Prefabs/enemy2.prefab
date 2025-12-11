@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4608122306516262053}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,9 +48,9 @@ GameObject:
   - component: {fileID: -9016013871591471368}
   - component: {fileID: 187550611837508100}
   - component: {fileID: 8977528569634753238}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: enemy2
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -180,14 +180,14 @@ SphereCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.05
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.08330257
+  m_Center: {x: 0, y: 0.000000023798545, z: -0.21878475}
 --- !u!114 &-4234872672309616938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -249,3 +249,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetTag: Player
   damagePerSecond: 10
+  isIceProjectile: 0
+  isPoisonProjectile: 0

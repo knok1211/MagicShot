@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -169453056147842923}
   m_Layer: 0
   m_Name: IceBlock
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8650114afdb343044a4e5e69e053a2ca, type: 2}
+  - {fileID: 2100000, guid: a6b1bd580cf71ac40b611ae611b2140d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

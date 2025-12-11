@@ -9,13 +9,11 @@ public class Projectile : MonoBehaviour
     public float lifeTime = 2f;
     public float surfaceExitOffset = 0.02f;
 
-    [Header("Damage")]
-    public float damage = 10f;
-
     Rigidbody _rigidbody;
     Vector3 _direction = Vector3.forward;
     float _lifeTimer;
     Light _pointLight;
+    
 
     void Awake()
     {
@@ -91,13 +89,21 @@ public class Projectile : MonoBehaviour
         if (collision.collider.TryGetComponent(out ProjectileReflector reflector))
         {
             // 반사 표면: 색상 변경 및 반사 처리
+
+            speed -= 3f;
+            if (speed < 2)
+            {
+                Destroy(gameObject);
+                return;
+            } 
+
+
             ChangeColorByBlock(collision.gameObject);
             reflector.HandleReflection(this, hitNormal);
             return;
         }
 
         // 반사되지 않는 경우: 적/오브젝트에 데미지 적용 시도
-        TryApplyDamage(collision.collider);
 
         // 블록 색상 확인 및 Point Light 색상 변경
         ChangeColorByBlock(collision.gameObject);
@@ -105,16 +111,7 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-    void TryApplyDamage(Collider other)
-    {
-        if (other == null) return;
 
-        Health health = other.GetComponent<Health>();
-        if (health != null)
-        {
-            health.TakeDamage(damage);
-        }
-    }
 
     void ChangeColorByBlock(GameObject block)
     {
@@ -125,23 +122,34 @@ public class Projectile : MonoBehaviour
         if (block.name.Contains("Ice"))
         {
             _pointLight.color = new Color(0.25f, 0.25f, 1f); // 파란색
+            
+            // ContactDamage 컴포넌트에 Ice 상태 전달
+            ContactDamage contactDamage = GetComponent<ContactDamage>();
+            if (contactDamage != null)
+            {
+                contactDamage.isIceProjectile = true;
+            }
         }
         else if (block.name.Contains("Fire"))
         {
             _pointLight.color = new Color(1f, 0.5f, 0f); // 주황색
-            // Fire 블록에 닿으면 0.1초 후 추가 발사체 생성
             SpawnSplitProjectile();
         }
         else if (block.name.Contains("Poison"))
         {
             _pointLight.color = new Color(1.5f, 0f, 1.5f); // 보라색
+
+            ContactDamage contactDamage = GetComponent<ContactDamage>();
+            if (contactDamage != null)
+            {
+                contactDamage.isPoisonProjectile = true;
+            }
         }
     }
 
     void SpawnSplitProjectile()
     {
-        // 본체의 속도를 80%로 감소
-        speed *= 0.8f;
+        
         ApplyVelocity();
         
         Invoke(nameof(CreateSplitProjectile), 0.05f);
