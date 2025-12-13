@@ -21,12 +21,66 @@ public class BlockCreation : MonoBehaviour
     public Text costText;
     private const int MAX_COST = 3;
 
+    [Header("UI Panel")]
+    public GameObject panelObject; // Panel GameObject 참조
+    private CanvasGroup panelCanvasGroup; // Panel의 CanvasGroup 컴포넌트
+
     void Start()
     {
         gameObject.SetActive(true);
         SetupBlockImages();
         SetupCompleteButton();
         UpdateCostUI();
+        SetupPanel();
+        ShowPanel(); // 스테이지 시작 시 UI 표시
+    }
+
+    void SetupPanel()
+    {
+        // Panel GameObject가 없으면 이 스크립트가 붙은 GameObject를 Panel로 사용
+        if (panelObject == null)
+        {
+            panelObject = gameObject;
+        }
+
+        // CanvasGroup 컴포넌트가 없으면 추가
+        panelCanvasGroup = panelObject.GetComponent<CanvasGroup>();
+        if (panelCanvasGroup == null)
+        {
+            panelCanvasGroup = panelObject.AddComponent<CanvasGroup>();
+        }
+    }
+
+    void ShowPanel()
+    {
+        if (panelCanvasGroup != null)
+        {
+            panelCanvasGroup.alpha = 1f; // 완전히 보이게
+            panelCanvasGroup.interactable = true; // 상호작용 가능
+            panelCanvasGroup.blocksRaycasts = true; // 레이캐스트 차단
+        }
+    }
+
+    // 외부에서 호출 가능한 public 메서드
+    public void ShowBlockCreationUI()
+    {
+        gameObject.SetActive(true);
+        ShowPanel();
+        // 코스트 초기화
+        if (GameController.Instance != null)
+        {
+            UpdateCostUI();
+        }
+    }
+
+    void HidePanel()
+    {
+        if (panelCanvasGroup != null)
+        {
+            panelCanvasGroup.alpha = 0f; // 투명하게
+            panelCanvasGroup.interactable = false; // 상호작용 불가
+            panelCanvasGroup.blocksRaycasts = false; // 레이캐스트 통과
+        }
     }
 
     void SetupBlockImages()
@@ -109,7 +163,7 @@ public class BlockCreation : MonoBehaviour
             GameController.Instance.StartGame();
             Debug.Log("게임 시작 호출됨");
         }
-        gameObject.SetActive(false);
+        HidePanel(); // Panel을 투명하게 만들기
     }
 
     string GetBlockName(int blockType)

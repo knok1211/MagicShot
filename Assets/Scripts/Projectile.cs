@@ -9,6 +9,17 @@ public class Projectile : MonoBehaviour
     public float lifeTime = 2f;
     public float surfaceExitOffset = 0.02f;
 
+    [Header("Damage")]
+    [Tooltip("적에게 주는 데미지량")]
+    public float damage = 10f;
+
+    [Header("Projectile Type")]
+    [Tooltip("Ice 발사체 여부 (속도 감소 효과)")]
+    public bool isIceProjectile = false;
+    
+    [Tooltip("Poison 발사체 여부 (지속 데미지 효과)")]
+    public bool isPoisonProjectile = false;
+
     Rigidbody _rigidbody;
     Vector3 _direction = Vector3.forward;
     float _lifeTimer;
@@ -103,9 +114,15 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        // 반사되지 않는 경우: 적/오브젝트에 데미지 적용 시도
+        // 적에 닿았는지 확인하고 데미지 적용
+        if (TryDamageEnemy(collision.collider))
+        {
+            // 적에게 데미지를 주었으면 발사체 파괴
+            Destroy(gameObject);
+            return;
+        }
 
-        // 블록 색상 확인 및 Point Light 색상 변경
+        // 반사되지 않는 경우: 블록 색상 확인 및 Point Light 색상 변경
         ChangeColorByBlock(collision.gameObject);
 
         Destroy(gameObject);
@@ -122,6 +139,7 @@ public class Projectile : MonoBehaviour
         if (block.name.Contains("Ice"))
         {
             _pointLight.color = new Color(0.25f, 0.25f, 1f); // 파란색
+            isIceProjectile = true;
             
             // ContactDamage 컴포넌트에 Ice 상태 전달
             ContactDamage contactDamage = GetComponent<ContactDamage>();
@@ -138,6 +156,7 @@ public class Projectile : MonoBehaviour
         else if (block.name.Contains("Poison"))
         {
             _pointLight.color = new Color(1.5f, 0f, 1.5f); // 보라색
+            isPoisonProjectile = true;
 
             ContactDamage contactDamage = GetComponent<ContactDamage>();
             if (contactDamage != null)
@@ -185,6 +204,62 @@ public class Projectile : MonoBehaviour
         Vector3 velocity = _direction * speed;
         velocity.y = 0f;
         _rigidbody.linearVelocity = velocity;
+    }
+
+    /// <summary>
+    /// 적에게 데미지를 주는 함수. 성공하면 true 반환
+    /// </summary>
+    bool TryDamageEnemy(Collider hitCollider)
+    {
+        if (hitCollider == null)
+            return false;
+
+        // 적 태그 확인 (Enemy 또는 Enemy2 등)
+        if (!hitCollider.CompareTag("Enemy"))
+            return false;
+
+        // Health 컴포넌트 찾기
+        Health enemyHealth = hitCollider.GetComponent<Health>();
+        if (enemyHealth == null)
+        {
+            // Health가 없으면 부모 오브젝트에서 찾기
+            enemyHealth = hitCollider.GetComponentInParent<Health>();
+        }
+
+        if (enemyHealth != null)
+        {
+            // 기본 데미지 적용
+            enemyHealth.TakeDamage(damage);
+            Debug.Log($"적에게 {damage} 데미지를 입혔습니다. (남은 체력: {enemyHealth.currentHealth}/{enemyHealth.maxHealth})");
+
+            // Ice 발사체 효과: 적 속도 감소
+            if (isIceProjectile)
+            {
+                EnemyController enemyController = hitCollider.GetComponent<EnemyController>();
+                if (enemyController == null)
+                {
+                    enemyController = hitCollider.GetComponentInParent<EnemyController>();
+                }
+                
+                if (enemyController != null)
+                {
+                    enemyController.ReduceSpeed(0.5f, 3f); // 50% 속도 감소, 3초 지속
+                    Debug.Log("Ice 효과: 적 속도 감소");
+                }
+            }
+
+            // Poison 발사체 효과: 최대 체력의 10% 추가 데미지
+            if (isPoisonProjectile)
+            {
+                float poisonDamage = enemyHealth.maxHealth * 0.1f;
+                enemyHealth.TakeDamage(poisonDamage);
+                Debug.Log($"Poison 효과: 추가 {poisonDamage} 데미지");
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
 

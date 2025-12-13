@@ -41,6 +41,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: hp bar (background)
+    uniqueID: 572728581
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

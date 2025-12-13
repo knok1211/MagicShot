@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 6f;
     public float damping = 10f;
+    public float fixedHeight = 1f;
+    public float rotationOffset = 90f;
 
     [Header("Combat")]
     public GameObject projectilePrefab;
@@ -20,13 +22,16 @@ public class PlayerController : MonoBehaviour
     Vector3 _moveInput;
     Vector3 _aimDirection = Vector3.forward;
     float _lastShotTime;
+    bool _isRecoiling = false;
+    float _baseRotationY = 0f;
 
     public Vector3 AimDirection => _aimDirection;
 
     void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
-        _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+        // Y 위치와 모든 회전 고정
+        _rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
 
         if (gameplayCamera == null)
             gameplayCamera = Camera.main;
@@ -35,8 +40,27 @@ public class PlayerController : MonoBehaviour
             projectileSpawnPoint = transform;
     }
 
+    void Start()
+    {
+        
+        Vector3 pos = transform.position;
+        pos.y = fixedHeight;
+        transform.position = pos;
+        
+        // Rigidbody 위치도 동기화
+        if (_rigidbody != null)
+        {
+            _rigidbody.position = pos;
+        }
+    }
+
     void Update()
     {
+        // Y 위치 강제 고정 (떠오르는 문제 방지)
+        Vector3 pos = transform.position;
+        pos.y = fixedHeight;
+        transform.position = pos;
+        
         ReadInput();
         AimTowardsPointer();
         TryFire();
@@ -44,6 +68,11 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        // FixedUpdate에서도 Y 위치 고정 (물리 시뮬레이션 후 위치 보정)
+        Vector3 pos = _rigidbody.position;
+        pos.y = fixedHeight;
+        _rigidbody.position = pos;
+        
         MoveCharacter();
     }
 
@@ -84,7 +113,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 mouseScreenPosition = Mouse.current.position.ReadValue();
         Ray ray = gameplayCamera.ScreenPointToRay(mouseScreenPosition);
-        Plane groundPlane = new Plane(Vector3.up, new Vector3(0f, transform.position.y, 0f));
+        Plane groundPlane = new Plane(Vector3.up, transform.position);
 
         if (groundPlane.Raycast(ray, out float enter))
         {
@@ -96,7 +125,17 @@ public class PlayerController : MonoBehaviour
             {
                 _aimDirection = direction.normalized;
                 float angle = Mathf.Atan2(_aimDirection.x, _aimDirection.z) * Mathf.Rad2Deg;
-                transform.rotation = Quaternion.Euler(120, 0f, -angle);
+                angle += rotationOffset;
+                
+                if (_isRecoiling)
+                {
+                    float currentY = transform.eulerAngles.y;
+                    transform.rotation = Quaternion.Euler(0f, currentY, 0f);
+                }
+                else
+                {
+                    transform.rotation = Quaternion.Euler(0f, angle, 0f);
+                }
             }
         }
     }
@@ -131,5 +170,45 @@ public class PlayerController : MonoBehaviour
         {
             projectileComponent.Initialize(_aimDirection);
         }
+
+        if (!_isRecoiling)
+        {
+            StartCoroutine(RecoilAnimation());
+        }
+    }
+
+    System.Collections.IEnumerator RecoilAnimation()
+    {
+        _isRecoiling = true;
+        _baseRotationY = transform.eulerAngles.y;
+
+        float recoilAngle = 20f;
+        float duration = 0.1f;
+        float returnDuration = 0.15f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            float currentY = Mathf.Lerp(_baseRotationY, _baseRotationY + recoilAngle, t);
+            transform.rotation = Quaternion.Euler(0f, currentY, 0f);
+            yield return null;
+        }
+
+        elapsed = 0f;
+        float startY = transform.eulerAngles.y;
+
+        while (elapsed < returnDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / returnDuration;
+            float currentY = Mathf.Lerp(startY, _baseRotationY, t);
+            transform.rotation = Quaternion.Euler(0f, currentY, 0f);
+            yield return null;
+        }
+
+        transform.rotation = Quaternion.Euler(0f, _baseRotationY, 0f);
+        _isRecoiling = false;
     }
 }

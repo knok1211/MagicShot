@@ -10,6 +10,10 @@ public class GameController : MonoBehaviour
     public GameObject fireBlockPrefab;    // FireBlock 프리팹
     public GameObject poisonBlockPrefab;  // PoisonBlock 프리팹
 
+    [Header("UI Prefab")]
+    public GameObject canvasPrefab;  // Canvas UI 프리팹 (모든 스테이지에 공통 적용)
+    // 참고: Resources 폴더에 Canvas 프리팹이 있으면 자동으로 로드됩니다.
+
     [Header("Block Map")]
     // 0: 블록 없음, 1: 일반 블록, 2: 얼음 블록, 3: 화염 블록, 4: 독 블록
     public int[,] blockMap = new int[50, 50];
@@ -35,7 +39,67 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        // UI가 없으면 자동으로 생성 (모든 스테이지에 공통 적용)
+        EnsureUIExists();
         GenerateBlocks();
+        ResetBlockCreationUI(); // 스테이지 시작 시 UI 다시 표시
+    }
+
+    void EnsureUIExists()
+    {
+        // BlockCreation 스크립트가 있는지 확인
+        BlockCreation existingUI = FindObjectOfType<BlockCreation>();
+        
+        // UI가 없으면 생성
+        if (existingUI == null)
+        {
+            GameObject prefabToInstantiate = null;
+            
+            // 1. 먼저 Inspector에서 할당된 프리팹 확인
+            if (canvasPrefab != null)
+            {
+                prefabToInstantiate = canvasPrefab;
+            }
+            // 2. Resources 폴더에서 자동 로드 시도
+            else
+            {
+                prefabToInstantiate = Resources.Load<GameObject>("Canvas");
+            }
+            
+            // 3. 프리팹을 찾았으면 인스턴스화
+            if (prefabToInstantiate != null)
+            {
+                GameObject uiInstance = Instantiate(prefabToInstantiate);
+                uiInstance.name = "Canvas"; // 이름을 Canvas로 설정
+                Debug.Log("UI가 자동으로 생성되었습니다.");
+            }
+            else
+            {
+                Debug.LogWarning("Canvas 프리팹을 찾을 수 없습니다. 다음 중 하나를 확인해주세요:\n" +
+                    "1. GameController의 Canvas Prefab 필드에 Canvas 프리팹 할당\n" +
+                    "2. Assets/Resources/ 폴더에 Canvas 프리팹 배치");
+            }
+        }
+    }
+
+    public void ResetBlockCreationUI()
+    {
+        // BlockCreation 스크립트를 찾아서 UI를 다시 표시
+        BlockCreation blockCreation = FindObjectOfType<BlockCreation>();
+        if (blockCreation != null)
+        {
+            blockCreation.ShowBlockCreationUI();
+        }
+        else
+        {
+            // UI가 없으면 다시 생성 시도
+            EnsureUIExists();
+            blockCreation = FindObjectOfType<BlockCreation>();
+            if (blockCreation != null)
+            {
+                blockCreation.ShowBlockCreationUI();
+            }
+        }
     }
 
     void SetupLayerCollisions()
