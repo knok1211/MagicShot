@@ -26,6 +26,10 @@ public class EnemyReward : MonoBehaviour
             CurrencyManager.Instance.AddCurrency(rewardAmount);
         }
 
+        GameController.Instance.AddCount(1);
+
+
+
         Destroy(gameObject);
     }
 }

@@ -3,21 +3,21 @@ using UnityEngine.SceneManagement;
 
 public class InGameBGMManager : MonoBehaviour
 {
-    public AudioClip inGameBGM; // ÀÎ°ÔÀÓ¿ë BGM ÆÄÀÏ
+    public AudioClip inGameBGM; // ï¿½Î°ï¿½ï¿½Ó¿ï¿½ BGM ï¿½ï¿½ï¿½ï¿½
 
     void Start()
     {
-        if (SceneManager.GetActiveScene().name != "Stage1")
-            return;
+        //if (SceneManager.GetActiveScene().name != "Stage1")
+           // return;
 
-        // ±âÁ¸ BGMPlayer°¡ ÀÖÀ¸¸é Á¦°Å
+        // ï¿½ï¿½ï¿½ï¿½ BGMPlayerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         GameObject oldBGM = GameObject.Find("StartBGM");
         if (oldBGM != null)
         {
             Destroy(oldBGM);
         }
 
-        // »õ·Î¿î ¹è°æÀ½¾Ç ÇÃ·¹ÀÌ¾î ¸¸µé±â
+        // ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
         GameObject newBGM = new GameObject("Stage1BGMPlayer");
         AudioSource audioSource = newBGM.AddComponent<AudioSource>();
         audioSource.clip = inGameBGM;

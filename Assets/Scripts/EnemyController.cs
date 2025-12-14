@@ -7,7 +7,8 @@ public class EnemyController : MonoBehaviour
     public float moveSpeed = 3f;
     
     [Header("Target")]
-    public Transform player;
+    //public Transform player;
+    GameObject playerObj;
     
     Rigidbody _rigidbody;
     Vector3 _targetPosition;
@@ -35,18 +36,14 @@ public class EnemyController : MonoBehaviour
             _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
         }
 
-        if (player == null)
-        {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-                player = playerObj.transform;
-        }
+
+            playerObj = GameObject.FindGameObjectWithTag("Player");
+
     }
 
     void Update()
     {
-        if (player == null)
-            return;
+
 
         // y축 위치를 1로 고정
         Vector3 pos = transform.position;
@@ -78,8 +75,7 @@ public class EnemyController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (player == null)
-            return;
+
 
         MoveTowardsTarget();
     }
@@ -90,7 +86,7 @@ public class EnemyController : MonoBehaviour
             return;
 
         Vector3 startPos = transform.position;
-        Vector3 endPos = player.position;
+        Vector3 endPos = playerObj.transform.position;
 
         int startX = Mathf.RoundToInt(startPos.x);
         int startZ = Mathf.RoundToInt(startPos.z);

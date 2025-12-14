@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -10,10 +11,6 @@ public class GameController : MonoBehaviour
     public GameObject fireBlockPrefab;    // FireBlock 프리팹
     public GameObject poisonBlockPrefab;  // PoisonBlock 프리팹
 
-    [Header("UI Prefab")]
-    public GameObject canvasPrefab;  // Canvas UI 프리팹 (모든 스테이지에 공통 적용)
-    // 참고: Resources 폴더에 Canvas 프리팹이 있으면 자동으로 로드됩니다.
-
     [Header("Block Map")]
     // 0: 블록 없음, 1: 일반 블록, 2: 얼음 블록, 3: 화염 블록, 4: 독 블록
     public int[,] blockMap = new int[50, 50];
@@ -22,11 +19,19 @@ public class GameController : MonoBehaviour
     public float[,] dangerMap = new float[50, 50];
     public float dangerDecayRate = 0.5f; // 초당 감소량
 
+    public int XMap;
+    public int ZMap;
+
     public int selectedX = -1;
     public int selectedZ = -1;
-    private int Stage = 0;
+    public int Stage = 0;
     private int currentCost = 0;
-    private const int MAX_COST = 3;
+    public int MAX_COST = 3;
+
+    public int EnemyAmout = 1;
+    public int EnemyKilled = 0;
+    public string nextSceneName = "Stage2";
+
     
     // 블록 타입별 코스트
     private static readonly int[] blockCosts = new int[] { 0, 1, 2, 3, 3 }; // 0: 없음, 1: 일반, 2: 얼음, 3: 화염, 4: 독
@@ -39,67 +44,15 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        // UI가 없으면 자동으로 생성 (모든 스테이지에 공통 적용)
-        EnsureUIExists();
         GenerateBlocks();
-        ResetBlockCreationUI(); // 스테이지 시작 시 UI 다시 표시
-    }
 
-    void EnsureUIExists()
-    {
-        // BlockCreation 스크립트가 있는지 확인
-        BlockCreation existingUI = FindObjectOfType<BlockCreation>();
+        blockMap[ZMap, XMap] = 20;
+        blockMap[ZMap+1, XMap-1] = 20;
+        blockMap[ZMap+1, XMap] = 20;
+        blockMap[ZMap, XMap-1] = 20;
+
+
         
-        // UI가 없으면 생성
-        if (existingUI == null)
-        {
-            GameObject prefabToInstantiate = null;
-            
-            // 1. 먼저 Inspector에서 할당된 프리팹 확인
-            if (canvasPrefab != null)
-            {
-                prefabToInstantiate = canvasPrefab;
-            }
-            // 2. Resources 폴더에서 자동 로드 시도
-            else
-            {
-                prefabToInstantiate = Resources.Load<GameObject>("Canvas");
-            }
-            
-            // 3. 프리팹을 찾았으면 인스턴스화
-            if (prefabToInstantiate != null)
-            {
-                GameObject uiInstance = Instantiate(prefabToInstantiate);
-                uiInstance.name = "Canvas"; // 이름을 Canvas로 설정
-                Debug.Log("UI가 자동으로 생성되었습니다.");
-            }
-            else
-            {
-                Debug.LogWarning("Canvas 프리팹을 찾을 수 없습니다. 다음 중 하나를 확인해주세요:\n" +
-                    "1. GameController의 Canvas Prefab 필드에 Canvas 프리팹 할당\n" +
-                    "2. Assets/Resources/ 폴더에 Canvas 프리팹 배치");
-            }
-        }
-    }
-
-    public void ResetBlockCreationUI()
-    {
-        // BlockCreation 스크립트를 찾아서 UI를 다시 표시
-        BlockCreation blockCreation = FindObjectOfType<BlockCreation>();
-        if (blockCreation != null)
-        {
-            blockCreation.ShowBlockCreationUI();
-        }
-        else
-        {
-            // UI가 없으면 다시 생성 시도
-            EnsureUIExists();
-            blockCreation = FindObjectOfType<BlockCreation>();
-            if (blockCreation != null)
-            {
-                blockCreation.ShowBlockCreationUI();
-            }
-        }
     }
 
     void SetupLayerCollisions()
@@ -203,6 +156,11 @@ public class GameController : MonoBehaviour
         {
             Debug.Log($"좌표 ({selectedX}, {selectedZ})가 맵 범위(0-{cols-1}, 0-{rows-1})를 벗어났습니다!");
         }
+    }
+
+    public int GetMaxCost()
+    {
+        return MAX_COST;
     }
 
     public void RegenerateBlocks()
@@ -342,5 +300,17 @@ public class GameController : MonoBehaviour
             enemy.SetActive(true);
             
         }
+    }
+
+
+
+        public void AddCount(int amount)
+    {
+        EnemyKilled += amount;
+        
+        if (EnemyKilled >= EnemyAmout) {
+        SceneManager.LoadScene(nextSceneName);
+    }
+
     }
 }

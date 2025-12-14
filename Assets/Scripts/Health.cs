@@ -50,7 +50,6 @@ public class Health : MonoBehaviour
 
 
 
-
     public void Heal(float amount)
     {
         currentHealth += amount;

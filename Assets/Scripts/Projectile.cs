@@ -24,6 +24,9 @@ public class Projectile : MonoBehaviour
     Vector3 _direction = Vector3.forward;
     float _lifeTimer;
     Light _pointLight;
+
+
+
     
 
     void Awake()
@@ -148,7 +151,7 @@ public class Projectile : MonoBehaviour
                 contactDamage.isIceProjectile = true;
             }
         }
-        else if (block.name.Contains("Fire"))
+        else if (block.name.Contains("FireBlock"))
         {
             _pointLight.color = new Color(1f, 0.5f, 0f); // 주황색
             SpawnSplitProjectile();
@@ -198,6 +201,8 @@ public class Projectile : MonoBehaviour
 
     void ApplyVelocity()
     {
+
+        GetComponent<AudioSource>().Play();
         if (_rigidbody == null)
             return;
 

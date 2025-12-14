@@ -19,6 +19,8 @@ public class BlockCreation : MonoBehaviour
 
     [Header("Cost UI")]
     public Text costText;
+    public Text StageText;
+
     private const int MAX_COST = 3;
 
     [Header("UI Panel")]
@@ -192,7 +194,10 @@ public class BlockCreation : MonoBehaviour
         if (costText != null && GameController.Instance != null)
         {
             int currentCost = GameController.Instance.GetCurrentCost();
-            costText.text = $"{currentCost}/{MAX_COST}";
+            int MAX_COST = GameController.Instance.GetMaxCost();
+
+            costText.text = $"Cost: {currentCost}/{MAX_COST}";
+            StageText.text = $"Stage {GameController.Instance.Stage}";
         }
     }
 

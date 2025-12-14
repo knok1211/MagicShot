@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 6f;
     public float damping = 10f;
     public float fixedHeight = 1f;
-    public float rotationOffset = 90f;
+    public float rotationOffset = 9f;
 
     [Header("Combat")]
     public GameObject projectilePrefab;
@@ -59,6 +59,7 @@ public class PlayerController : MonoBehaviour
         // Y 위치 강제 고정 (떠오르는 문제 방지)
         Vector3 pos = transform.position;
         pos.y = fixedHeight;
+
         transform.position = pos;
         
         ReadInput();
@@ -161,7 +162,7 @@ public class PlayerController : MonoBehaviour
         _lastShotTime = Time.time;
 
         Vector3 spawnPosition = projectileSpawnPoint.position;
-        spawnPosition.y = transform.position.y;
+        spawnPosition.y = 1;
         Quaternion spawnRotation = Quaternion.LookRotation(_aimDirection, Vector3.up);
         GameObject projectile = Instantiate(projectilePrefab, spawnPosition, spawnRotation);
 

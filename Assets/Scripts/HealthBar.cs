@@ -11,19 +11,27 @@ public class HealthBar : MonoBehaviour
 
     void Start()
     {
+        //Debug.Log($"HealthBar Start - targetHealth: {targetHealth}, fillImage: {fillImage}");
         if (targetHealth != null)
         {
             targetHealth.onHealthChanged.AddListener(UpdateHealthBar);
             UpdateHealthBar(targetHealth.currentHealth, targetHealth.maxHealth);
+            //Debug.Log($"HealthBar 초기화 완료 - 체력: {targetHealth.currentHealth}/{targetHealth.maxHealth}");
         }
+
     }
 
     void UpdateHealthBar(float current, float max)
     {
-        if (fillImage == null) return;
+        Debug.Log($"HealthBar UpdateHealthBar 호출 - current: {current}, max: {max}");
+        if (fillImage == null) 
+        {
+            return;
+        }
 
         float ratio = max > 0f ? current / max : 0f;
         fillImage.fillAmount = ratio;
+        Debug.Log($"HealthBar fillAmount 설정: {ratio}");
     }
 
     void OnDestroy()
