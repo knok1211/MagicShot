@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6744679220178100343}
   - component: {fileID: 8304854781763105007}
   - component: {fileID: 6407138372224157205}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4846,7 +4846,7 @@ GameObject:
   - component: {fileID: 5623799363877666939}
   - component: {fileID: 4366875621914585395}
   - component: {fileID: -169453056147842923}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PoisonBlock
   m_TagString: Block
   m_Icon: {fileID: 0}
