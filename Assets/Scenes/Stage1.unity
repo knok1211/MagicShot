@@ -2211,6 +2211,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1619842390518549065, guid: 572dacd552f75554ab2cb2cb11ac613c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 4c1f913f00689dc4a8aef05707be1eaf, type: 3}
     - target: {fileID: 3952046810861818797, guid: 572dacd552f75554ab2cb2cb11ac613c, type: 3}
       propertyPath: defaultTooltip
       value: "\uC18C\uD658\uC0AC\uB2D8, \uD658\uC601\uD569\uB2C8\uB2E4!\n\n\uBE48

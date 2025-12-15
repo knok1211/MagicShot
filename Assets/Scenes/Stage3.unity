@@ -2831,6 +2831,10 @@ PrefabInstance:
       propertyPath: m_FillMethod
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1619842390518549065, guid: 572dacd552f75554ab2cb2cb11ac613c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 3ac72c185521c7c48abdd0ec2f9ac96a, type: 3}
     - target: {fileID: 2722721195971410122, guid: 572dacd552f75554ab2cb2cb11ac613c, type: 3}
       propertyPath: playerHealth
       value: 
